@@ -336,6 +336,49 @@
             color: #333;
         }
 
+        /* Absent Students Section */
+        .absent-students-container {
+            border: 2px solid #6c757d;
+            background-color: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .absent-students-container h3 {
+            background-color: #6c757d;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 0;
+        }
+        .absent-students-container table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #6c757d;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .absent-students-container th {
+            background-color: #6c757d;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .absent-students-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .absent-students-container tr:hover {
+            background-color: #e9ecef;
+        }
+        .absent-students-container td {
+            padding: 10px;
+            color: #333;
+        }
+
         /* Instructions Container */
         .instructions-container {
             background-color: #ffffff;
@@ -408,16 +451,17 @@
 
     <!-- Tables for Results -->
     <div class="student-lists-container">
-        <!-- OPTIONAL STUDENTS SECTION -->
-        <div class="student-table-container optional-students-container">
-            <h3>Students removed as homework optional</h3>
-            <button class="copy-button" onclick="copyTableToClipboard('optional-student-table')">
+
+        <!-- ABSENT STUDENTS SECTION -->
+        <div class="student-table-container absent-students-container">
+            <h3>Absent Students</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('absent-student-table')">
                 Copy to Clipboard
             </button>
-            <button class="download-button" onclick="downloadTableAsCSV('optional-student-table', 'Optional Students')">
+            <button class="download-button" onclick="downloadTableAsCSV('absent-student-table', 'Absent Students')">
                 Download as CSV
             </button>
-            <table id="optional-student-table"></table>
+            <table id="absent-student-table"></table>
         </div>
 
         <!-- TO TOMORROW STUDENTS SECTION -->
@@ -454,6 +498,18 @@
                 Download as CSV
             </button>
             <table id="homework-texts-table"></table>
+        </div>
+
+        <!-- OPTIONAL STUDENTS SECTION -->
+        <div class="student-table-container optional-students-container">
+            <h3>Students removed as homework optional</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('optional-student-table')">
+                Copy to Clipboard
+            </button>
+            <button class="download-button" onclick="downloadTableAsCSV('optional-student-table', 'Optional Students')">
+                Download as CSV
+            </button>
+            <table id="optional-student-table"></table>
         </div>
     </div>
 
@@ -640,6 +696,10 @@
         optionalDetentions = detentions.filter(d => d.homeworkStatus === "Optional homework");
         leftoverDetentions = detentions.filter(d => !(d.homeworkStatus === "Optional homework"));
 
+        // 2) Absent students (Attendance Today = "0")
+        absentDetentions = leftoverDetentions.filter(d => d.presentToday === 0);
+        leftoverDetentions = leftoverDetentions.filter(d => d.presentToday !== 0);
+
         TOTomorrow = leftoverDetentions.filter(d =>
                 (
                     ((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") ||
@@ -673,6 +733,7 @@
         generateStudentTable("TOT-student-table",      TOTomorrow);
         generateStudentTable("ASDToday-student-table", ASDToday);
         generateStudentTable("homework-texts-table",   homeworkDetentionTexts);
+        generateStudentTable("absent-student-table",   absentDetentions);
     }
 
     function generateStudentTable(tableId, data) {
