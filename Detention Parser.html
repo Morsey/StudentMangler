@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>St James Detention Processor</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        /* Page Container for consistent alignment */
+        .page-container {
+            max-width: 1200px; /* Adjust as necessary */
+            margin: 0 auto;
+            padding: 0 20px;   /* Optional: some horizontal padding */
+        }
+
+        /************************************************
+         * HEADER STYLES
+         ************************************************/
+        .header-container {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header-container img {
+            max-height: 80px; /* Adjust as necessary */
+        }
+        .header-titles {
+            margin-left: 20px; /* Space between logo & text */
+        }
+        .header-titles h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
+        }
+        .header-titles h2 {
+            font-size: 14px;
+            margin: 5px 0 0;
+            color: #777;
+        }
+
+        /* Button Styles */
+        button {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #button-reset {
+            color: #fff;
+            background-color: #dc3545;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #button-reset:hover {
+            background-color: #c82333;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        #button-classify-detentions {
+            color: #fff;
+            background-color: #007bff;
+            cursor: not-allowed;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #button-classify-detentions:enabled {
+            cursor: pointer;
+            background-color: #28a745;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        #button-classify-detentions:enabled:hover {
+            background-color: #218838;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .copy-button {
+            color: #fff;
+            background-color: #28a745;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+        .download-button {
+            color: #fff;
+            background-color: #007bff;
+        }
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Drop Zone Styles */
+        #dropZone {
+            margin: 50px 0;  /* Only vertical margin, aligned within the container */
+
+            height: 200px;
+            border-radius: 10px;
+            border: 2px dashed #8400ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #555;
+            background-color: rgba(206, 110, 183, 0.54);
+        }
+        #dropZone.dragover {
+            border-color: #00f;
+            color: #00f;
+        }
+
+        .drop-zone-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 50px 0; /* Only vertical margin, no auto horizontal centering */
+            gap: 20px;
+        }
+        .drop-zone {
+            width: 300px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 16px;
+            border: 2px solid;
+        }
+        #drop-zone-detention-list {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        #drop-zone-timetable-list {
+            border-color: #8400ff;
+            color: #8400ff;
+        }
+        #drop-zone-student-list {
+            border-color: #ff00d5;
+            color: #ff00d5;
+        }
+        .drop-zone.dragover {
+            background-color: #e0f7ff;
+        }
+
+        /* Table Container Styles */
+        .student-lists-container {
+            margin: 0 0 20px 0; /* Adjust bottom margin if desired */
+        }
+
+        /* ***************************************
+         * STYLES FOR EACH DETENTION TYPE SECTION
+           (Optional, TO Tomorrow, ASD Today)
+         ****************************************/
+
+        /* Optional Students Section */
+        .optional-students-container {
+            border: 2px solid #17a2b8;       /* Accent color */
+            background-color: #eaf7fa;       /* Light tint */
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .optional-students-container h3 {
+            background-color: #17a2b8;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 0;
+        }
+        .optional-students-container table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #17a2b8;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .optional-students-container th {
+            background-color: #17a2b8;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .optional-students-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .optional-students-container tr:hover {
+            background-color: #e0f7ff;
+        }
+        .optional-students-container td {
+            padding: 10px;
+            color: #333;
+        }
+
+        /* TO Tomorrow Students Section */
+        .totomorrow-students-container {
+            border: 2px solid #ff8c00;
+            background-color: #fff7ea;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .totomorrow-students-container h3 {
+            background-color: #ff8c00;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 0;
+        }
+        .totomorrow-students-container table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ff8c00;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .totomorrow-students-container th {
+            background-color: #ff8c00;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .totomorrow-students-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .totomorrow-students-container tr:hover {
+            background-color: #ffe8cf;
+        }
+        .totomorrow-students-container td {
+            padding: 10px;
+            color: #333;
+        }
+
+        /* ASD Today Students Section */
+        .asdtoday-students-container {
+            border: 2px solid #dc3545;
+            background-color: #faeaea;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .asdtoday-students-container h3 {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 0;
+        }
+        .asdtoday-students-container table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dc3545;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .asdtoday-students-container th {
+            background-color: #dc3545;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .asdtoday-students-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .asdtoday-students-container tr:hover {
+            background-color: #f9d6d9;
+        }
+        .asdtoday-students-container td {
+            padding: 10px;
+            color: #333;
+        }
+
+        /* Homework Detention Texts Section */
+        .homework-texts-container {
+            border: 2px solid #ffa500; /* Use any color you like */
+            background-color: #fffbe6; /* Light tinted background */
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .homework-texts-container h3 {
+            background-color: #ffa500;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 0;
+        }
+        .homework-texts-container table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ffa500;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .homework-texts-container th {
+            background-color: #ffa500;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .homework-texts-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .homework-texts-container tr:hover {
+            background-color: #fff2d9;
+        }
+        .homework-texts-container td {
+            padding: 10px;
+            color: #333;
+        }
+
+        /* Instructions Container */
+        .instructions-container {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions-container h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .instructions-container p,
+        .instructions-container li {
+            font-size: 16px;
+            color: #555;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="page-container"><!-- PAGE CONTAINER START -->
+
+    <!-- HEADER CONTAINER -->
+    <div class="header-container">
+        <!-- Truncated Base64 Image Data -->
+        <img src="data:image/png;base64,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" alt="School Logo" />
+        <div class="header-titles">
+            <h1>St James Detentions Processor</h1>
+            <h2>developed by Rob Morse</h2>
+        </div>
+    </div>
+
+    <!-- Instructions Section -->
+    <div class="instructions-container">
+        <h2>Instructions</h2>
+        <p>Please follow these steps to upload your files:</p>
+        <ol>
+            <li>Drop all three data files needed into the drop zone (these files should not be renamed before using):</li>
+            <ul>
+                <li>Detentions file downloaded from classcharts</li>
+                <li>Student list report from Bromcom</li>
+                <li>Timetable report from Bromcom</li>
+            </ul>
+            <li>Click "Classify Detention"</li>
+            <li>This will generate several lists as needed</li>
+        </ol>
+        <p>If you need to start over at any time, click the “Reset” button.</p>
+    </div>
+
+    <!-- Main Drop Zone for Files -->
+    <div id="dropZone">Drop files here for processing</div>
+
+    <!-- Individual Drop Zones -->
+    <div class="drop-zone-container">
+        <div id="drop-zone-detention-list" class="drop-zone">Detentions</div>
+        <div id="drop-zone-timetable-list" class="drop-zone">Timetables</div>
+        <div id="drop-zone-student-list" class="drop-zone">Students</div>
+    </div>
+
+    <!-- Buttons -->
+    <button id="button-reset" onclick="resetPage()">Reset</button>
+    <button id="button-classify-detentions" disabled>Classify Detentions</button>
+
+    <button id="button-generate-asdtoday-docs">Generate ASD Today Docs</button>
+
+    <!-- Tables for Results -->
+    <div class="student-lists-container">
+        <!-- OPTIONAL STUDENTS SECTION -->
+        <div class="student-table-container optional-students-container">
+            <h3>Students removed as homework optional</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('optional-student-table')">
+                Copy to Clipboard
+            </button>
+            <button class="download-button" onclick="downloadTableAsCSV('optional-student-table', 'Optional Students')">
+                Download as CSV
+            </button>
+            <table id="optional-student-table"></table>
+        </div>
+
+        <!-- TO TOMORROW STUDENTS SECTION -->
+        <div class="student-table-container totomorrow-students-container">
+            <h3>Students moved to TO tomorrow as cannot do detention (No Detentions Flag or Year 7/8 Bus)</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('TOT-student-table')">
+                Copy to Clipboard
+            </button>
+            <button class="download-button" onclick="downloadTableAsCSV('TOT-student-table', 'TO Tomorrow Students')">
+                Download as CSV
+            </button>
+            <table id="TOT-student-table"></table>
+        </div>
+
+        <!-- ASD TODAY STUDENTS SECTION -->
+        <div class="student-table-container asdtoday-students-container">
+            <h3>All after school detention students for today (including homework, late etc...)</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('ASDToday-student-table')">
+                Copy to Clipboard
+            </button>
+            <button class="download-button" onclick="downloadTableAsCSV('ASDToday-student-table', 'ASD Today')">
+                Download as CSV
+            </button>
+            <table id="ASDToday-student-table"></table>
+        </div>
+
+        <!-- HOMEWORK DETENTION TEXTS SECTION -->
+        <div class="student-table-container homework-texts-container">
+            <h3>Students to send texts home for detention today (Homework ONLY)</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('homework-texts-table')">
+                Copy to Clipboard
+            </button>
+            <button class="download-button" onclick="downloadTableAsCSV('homework-texts-table', 'Homework Detention Texts')">
+                Download as CSV
+            </button>
+            <table id="homework-texts-table"></table>
+        </div>
+    </div>
+
+    <!-- Output Section -->
+    <div id="output"></div>
+
+</div><!-- PAGE CONTAINER END -->
+
+<!-- External Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Add these lines anywhere above your main script -->
+<script src="https://unpkg.com/pizzip@3.1.7/dist/pizzip.js"></script>
+<script src="https://unpkg.com/pizzip@3.1.7/dist/pizzip-utils.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.57.1/docxtemplater.min.js" integrity="sha512-TRYli2oUTOtkaL8mPsLYAqcg2xmGOuKNkYHNsbCQU3fhchKedp6vlkdNdDKt7wEW2uGV0dF2be9sldHKGnZDWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+<script>
+    /***********************
+     * Global Variables
+     ***********************/
+    let students = {};
+    let detentions = [];
+
+    let optionalDetentions = [];
+    let ASDToday = [];
+    let TOTomorrow = [];
+    let homeworkDetentionTexts = [];
+
+    let filesLoaded = {
+        detentionList: false,
+        timetableList: false,
+        studentList: false,
+    };
+
+    let doc_template = null
+
+    /***********************
+     * Event Listeners
+     ***********************/
+    const dropZone = document.getElementById("dropZone");
+    const buttonClassify = document.getElementById("button-classify-detentions");
+
+    dropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+
+        const files = event.dataTransfer.files;
+        for (let i = 0; i < files.length; i++) {
+            handleFile(files[i]);
+        }
+    });
+
+    buttonClassify.addEventListener("click", classifyDetentions);
+
+    /***********************
+     * File Processing
+     ***********************/
+    function handleFile(file) {
+
+        const name = file.name.toLowerCase();
+
+        if (name.endsWith(".docx")) {
+            // NEW: Call a function to process a docx template
+            processDocxFile(file);
+        } else if (name.includes("detentions")) {
+            processDetentionFile(file);
+        } else if (name.includes("student lists")) {
+            processStudentListsFile(file);
+        } else if (name.includes("locations")) {
+            processLocationsFile(file);
+        } else {
+            console.warn(`Unrecognized file: ${file.name}`);
+        }
+    }
+
+    async function processDocxFile(file) {
+        try {
+            // 1. Convert file into ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+
+            // 2. Initialize docxtemplater
+            const zip = new PizZip(arrayBuffer);
+            doc_template = new docxtemplater(zip, {
+                paragraphLoop: true,
+                linebreaks: true,
+            });
+
+            console.log("DOCX template loaded successfully!");
+        } catch (error) {
+            console.error("Error processing DOCX file:", error);
+        }
+    }
+
+    async function processDetentionFile(file) {
+        try {
+            const jsonData = await parseExcelFile(file);
+            detentions = [...detentions, ...jsonData];
+            document.getElementById("drop-zone-detention-list").innerText = `Detention List Loaded (${jsonData.length})`;
+            filesLoaded.detentionList = true;
+            checkFilesLoaded();
+        } catch (error) {
+            displayError("Error processing detention file.");
+        }
+    }
+
+    async function processStudentListsFile(file) {
+        try {
+            const jsonData = await parseExcelFile(file);
+            jsonData.forEach(student => {
+                if (!students[student.UPN]) {
+                    students[student.UPN] = { details: student };
+                }
+            });
+            document.getElementById("drop-zone-student-list").innerText = `Student List Loaded (${jsonData.length})`;
+            filesLoaded.studentList = true;
+            checkFilesLoaded();
+        } catch (error) {
+            displayError("Error processing student list file.");
+        }
+    }
+
+    async function processLocationsFile(file) {
+        try {
+            const jsonData = await parseExcelFile(file);
+            jsonData.forEach(student => {
+                if (students[student.UPN]) {
+                    students[student.UPN].timetable = student;
+                }
+            });
+            document.getElementById("drop-zone-timetable-list").innerText = `Timetable List Loaded (${jsonData.length})`;
+            filesLoaded.timetableList = true;
+            checkFilesLoaded();
+        } catch (error) {
+            displayError("Error processing locations file.");
+        }
+    }
+
+    async function parseExcelFile(file) {
+        const fileData = await file.arrayBuffer();
+        const workbook = XLSX.read(fileData, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        return XLSX.utils.sheet_to_json(sheet);
+    }
+
+    /***********************
+     * Helper Functions
+     ***********************/
+    function classifyDetentions() {
+        // Add student details to detentions
+        for (const detention of detentions) {
+            let student;
+            if (detention["Pupil ID"] in students) {
+                student = students[detention["Pupil ID"]];
+            } else {
+                continue;
+            }
+
+            // Add details
+            detention["presentToday"]   = student.details["Attendance Today"] ?? "";
+            detention["homeworkStatus"] = student.details["Homework Status"] ?? "";
+            detention["schoolBus"]      = student.details["School Bus"]       ?? "";
+            detention["noDetentions"]   = student.details["No Detentions"]    ?? "";
+
+            // Add timetable info
+            detention["noticeClassName"] = student.timetable?.["Class Name"]         ?? "";
+            detention["noticeRoom"]      = student.timetable?.["Room"]               ?? "";
+            detention["noticeStaffCode"] = student.timetable?.["Staff Code"]         ?? "";
+            detention["noticePeriod"]    = student.timetable?.["Period Display Name"]?? "";
+        }
+
+        let leftoverDetentions = [...detentions];
+
+        // Categorize
+        optionalDetentions = detentions.filter(d => d.homeworkStatus === "Optional homework");
+        leftoverDetentions = detentions.filter(d => !(d.homeworkStatus === "Optional homework"));
+
+        TOTomorrow = leftoverDetentions.filter(d =>
+                (
+                    ((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") ||
+                    d.noDetentions === "Yes"
+                )
+        );
+
+        leftoverDetentions = leftoverDetentions.filter(d =>
+                !((
+                    ((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") ||
+                    d.noDetentions === "Yes"
+                ))
+        );
+
+        ASDToday = leftoverDetentions
+
+        // Homework Detention Texts
+        homeworkDetentionTexts = ASDToday.filter(d => d["Detention type"] === "Homework Detention");
+
+        // Sort ASD Today by room (letter then number)
+        ASDToday.sort((a, b) => {
+            const [letterA, numberA] = [a.noticeRoom[0], parseInt(a.noticeRoom.slice(1), 10)];
+            const [letterB, numberB] = [b.noticeRoom[0], parseInt(b.noticeRoom.slice(1), 10)];
+            if (letterA < letterB) return -1;
+            if (letterA > letterB) return 1;
+            return numberA - numberB;
+        });
+
+        // Generate tables
+        generateStudentTable("optional-student-table", optionalDetentions);
+        generateStudentTable("TOT-student-table",      TOTomorrow);
+        generateStudentTable("ASDToday-student-table", ASDToday);
+        generateStudentTable("homework-texts-table",   homeworkDetentionTexts);
+    }
+
+    function generateStudentTable(tableId, data) {
+        const table = document.getElementById(tableId);
+        table.innerHTML = "";
+
+        const thead = `<thead><tr>
+      <th>UPN</th>
+      <th>Tutor</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Period 4 Room</th>
+      <th>Period 4 Class</th>
+      <th>Period 4 Teacher</th>
+      <th>Homework Status</th>
+      <th>Bus</th>
+      <th>No Detentions</th>
+    </tr></thead>`;
+
+        const tbody = data.map(d => `
+      <tr>
+        <td>${d["Pupil ID"]}</td>
+        <td>${d["Tutor group"]}</td>
+        <td>${d["First name"]} ${d["Last name"]}</td>
+        <td>${d["Behaviour type"]}</td>
+        <td>${d["noticeRoom"]}</td>
+        <td>${d["noticeClassName"]}</td>
+        <td>${d["noticeStaffCode"]}</td>
+        <td>${d["homeworkStatus"]}</td>
+        <td>${d["schoolBus"]}</td>
+        <td>${d["noDetentions"]}</td>
+      </tr>`).join("");
+
+        table.innerHTML = thead + `<tbody>${tbody}</tbody>`;
+    }
+
+    function copyTableToClipboard(tableId) {
+        const table = document.getElementById(tableId);
+        const rows = Array.from(table.rows);
+        const text = rows
+            .map(row => Array.from(row.cells).map(cell => cell.innerText).join("\t"))
+            .join("\n");
+
+        navigator.clipboard.writeText(text)
+            .then(() => alert("Table copied to clipboard!"))
+            .catch(err => console.error("Failed to copy table: ", err));
+    }
+
+    function downloadTableAsCSV(tableId, tableTitle) {
+        const table = document.getElementById(tableId);
+        const rows = Array.from(table.rows);
+        const csvContent = rows
+            .map(row => Array.from(row.cells).map(cell => `"${cell.innerText}"`).join(","))
+            .join("\n");
+
+        const currentDate = new Date().toISOString().split("T")[0];
+        const filename = `${tableTitle.replace(/\s+/g, '_')}_${currentDate}.csv`;
+
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function checkFilesLoaded() {
+        buttonClassify.disabled = !(
+            filesLoaded.detentionList &&
+            filesLoaded.timetableList &&
+            filesLoaded.studentList
+        );
+    }
+
+    function resetPage() {
+        location.reload();
+    }
+
+    function displayError(message) {
+        document.getElementById("output").innerHTML = `<p style="color: red;">${message}</p>`;
+    }
+
+    // NEW FUNCTION to loop through ASD Today detentions and populate the template:
+    function generateASDTodayDocs() {
+        // Make sure the doc_template is loaded
+        if (!doc_template) {
+            alert("No .docx template loaded yet!");
+            return;
+        }
+
+
+
+        const doc = doc_template
+        // Render the document (Replace {first_name} by John, {last_name} by Doe)
+        doc.render({
+            "detentions": ASDToday
+        });
+
+
+        const blob = doc.getZip().generate({
+            type: "blob",
+            mimeType:
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            /*
+             * compression: DEFLATE adds a compression step.
+             * For a 50MB output document, expect 500ms additional CPU time
+             */
+            compression: "DEFLATE",
+        });
+        // Output the document using Data-URI
+        saveAs(blob, "output.docx");
+    }
+
+    // NEW EVENT LISTENER for that button
+    document
+        .getElementById("button-generate-asdtoday-docs")
+        .addEventListener("click", generateASDTodayDocs);
+</script>
+</body>
+</html>
