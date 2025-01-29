@@ -85,6 +85,53 @@
             background-color: #218838;
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
         }
+        #button-generate-asdtoday-docs {
+            color: #fff;
+            background-color: #6f42c1; /* Purple */
+            cursor: not-allowed;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #button-generate-asdtoday-docs:enabled {
+            cursor: pointer;
+            background-color: #8a4be2; /* Brighter purple */
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #button-generate-asdtoday-docs:enabled:hover {
+            background-color: #5a32a3; /* Darker purple on hover */
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        #button-download-spreadsheet {
+            color: #fff;
+            background-color: #17a2b8; /* Teal */
+            cursor: not-allowed;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #button-download-spreadsheet:enabled {
+            cursor: pointer;
+            background-color: #138496; /* Darker teal */
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #button-download-spreadsheet:enabled:hover {
+            background-color: #0f6674; /* Even darker teal */
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+        }
 
         .copy-button {
             color: #fff;
@@ -161,7 +208,7 @@
 
         /* ***************************************
          * STYLES FOR EACH DETENTION TYPE SECTION
-           (Optional, TO Tomorrow, ASD Today)
+           (Optional, TO Today, ASD Today)
          ****************************************/
 
         /* Optional Students Section */
@@ -207,22 +254,22 @@
             color: #333;
         }
 
-        /* TO Tomorrow Students Section */
-        .totomorrow-students-container {
+        /* TO Today Students Section */
+        .toToday-students-container {
             border: 2px solid #ff8c00;
             background-color: #fff7ea;
             margin: 20px 0;
             padding: 15px;
             border-radius: 8px;
         }
-        .totomorrow-students-container h3 {
+        .toToday-students-container h3 {
             background-color: #ff8c00;
             color: #fff;
             padding: 10px;
             border-radius: 6px;
             margin-top: 0;
         }
-        .totomorrow-students-container table {
+        .toToday-students-container table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid #ff8c00;
@@ -232,20 +279,20 @@
             margin-top: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .totomorrow-students-container th {
+        .toToday-students-container th {
             background-color: #ff8c00;
             color: #fff;
             text-transform: uppercase;
             font-weight: bold;
             padding: 10px;
         }
-        .totomorrow-students-container tr:nth-child(even) {
+        .toToday-students-container tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .totomorrow-students-container tr:hover {
+        .toToday-students-container tr:hover {
             background-color: #ffe8cf;
         }
-        .totomorrow-students-container td {
+        .toToday-students-container td {
             padding: 10px;
             color: #333;
         }
@@ -400,9 +447,97 @@
             color: #555;
         }
 
+        /* Compact Floating Navigation */
+        .nav-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        /* Menu Button */
+        #nav-toggle {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        #nav-toggle:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        /* Floating Nav: Initially Hidden */
+        .floating-nav {
+            display: none;
+            position: absolute;
+            top: 35px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Show menu when hovering over the button or menu itself */
+        .nav-container:hover .floating-nav {
+            display: block;
+        }
+
+        /* List styles */
+        .floating-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .floating-nav li {
+            margin: 5px 0;
+        }
+
+        /* Link Styles */
+        .floating-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 5px 10px;
+            transition: background 0.3s;
+        }
+
+        .floating-nav a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
     </style>
 </head>
+
+
 <body>
+<!-- Compact Floating Navigation Menu -->
+<div class="nav-container">
+    <button id="nav-toggle">☰ Menu</button>
+    <nav class="floating-nav">
+        <ul>
+            <li><a href="#">⬆️ Top</a></li>
+            <li><a href="#absent-students">🚫 Absent</a></li>
+            <li><a href="#optional-students">✅ Removed</a></li>
+            <li><a href="#toToday-students">📅 TO Today</a></li>
+            <li><a href="#asdtoday-students">📌 ASD Today</a></li>
+            <li><a href="#homework-texts">✉️ ASD Text</a></li>
+        </ul>
+    </nav>
+</div>
 
 <div class="page-container"><!-- PAGE CONTAINER START -->
 
@@ -429,6 +564,7 @@
             </ul>
             <li>Click "Classify Detention"</li>
             <li>This will generate several lists as needed</li>
+            <li>You can then download the slips to hand out and the daily summary spreadsheet</li>
         </ol>
         <p>If you need to start over at any time, click the “Reset” button.</p>
     </div>
@@ -446,71 +582,53 @@
     <!-- Buttons -->
     <button id="button-reset" onclick="resetPage()">Reset</button>
     <button id="button-classify-detentions" disabled>Classify Detentions</button>
-
-    <button id="button-generate-asdtoday-docs">Generate ASD Today Docs</button>
+    <button id="button-generate-asdtoday-docs" disabled>Generate ASD Today Docs</button>
+    <button id="button-download-spreadsheet" disabled>Download Spreadsheet</button>
 
     <!-- Tables for Results -->
     <div class="student-lists-container">
 
-        <!-- ABSENT STUDENTS SECTION -->
-        <div class="student-table-container absent-students-container">
+        <!-- Absent Students -->
+        <div id="absent-students" class="student-table-container absent-students-container">
             <h3>Absent Students</h3>
-            <button class="copy-button" onclick="copyTableToClipboard('absent-student-table')">
-                Copy to Clipboard
-            </button>
-            <button class="download-button" onclick="downloadTableAsCSV('absent-student-table', 'Absent Students')">
-                Download as CSV
-            </button>
+            <button class="copy-button" onclick="copyTableToClipboard('absent-student-table')">Copy to Clipboard</button>
+            <button class="download-button" onclick="downloadTableAsCSV('absent-student-table', 'Absent Students')">Download as CSV</button>
             <table id="absent-student-table"></table>
         </div>
 
-        <!-- TO TOMORROW STUDENTS SECTION -->
-        <div class="student-table-container totomorrow-students-container">
-            <h3>Students moved to TO tomorrow as cannot do detention (No Detentions Flag or Year 7/8 Bus)</h3>
-            <button class="copy-button" onclick="copyTableToClipboard('TOT-student-table')">
-                Copy to Clipboard
-            </button>
-            <button class="download-button" onclick="downloadTableAsCSV('TOT-student-table', 'TO Tomorrow Students')">
-                Download as CSV
-            </button>
+        <!-- Optional Students -->
+        <div id="optional-students" class="student-table-container optional-students-container">
+            <h3>Students removed as homework optional</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('optional-student-table')">Copy to Clipboard</button>
+            <button class="download-button" onclick="downloadTableAsCSV('optional-student-table', 'Optional Students')">Download as CSV</button>
+            <table id="optional-student-table"></table>
+        </div>
+
+        <!-- TO Today Students -->
+        <div id="toToday-students" class="student-table-container toToday-students-container">
+            <h3>Students moved to TO Today</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('TOT-student-table')">Copy to Clipboard</button>
+            <button class="download-button" onclick="downloadTableAsCSV('TOT-student-table', 'TO Today Students')">Download as CSV</button>
             <table id="TOT-student-table"></table>
         </div>
 
-        <!-- ASD TODAY STUDENTS SECTION -->
-        <div class="student-table-container asdtoday-students-container">
-            <h3>All after school detention students for today (including homework, late etc...)</h3>
-            <button class="copy-button" onclick="copyTableToClipboard('ASDToday-student-table')">
-                Copy to Clipboard
-            </button>
-            <button class="download-button" onclick="downloadTableAsCSV('ASDToday-student-table', 'ASD Today')">
-                Download as CSV
-            </button>
+        <!-- ASD Today -->
+        <div id="asdtoday-students" class="student-table-container asdtoday-students-container">
+            <h3>All after school detention students for today</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('ASDToday-student-table')">Copy to Clipboard</button>
+            <button class="download-button" onclick="downloadTableAsCSV('ASDToday-student-table', 'ASD Today')">Download as CSV</button>
             <table id="ASDToday-student-table"></table>
         </div>
 
-        <!-- HOMEWORK DETENTION TEXTS SECTION -->
-        <div class="student-table-container homework-texts-container">
-            <h3>Students to send texts home for detention today (Homework ONLY)</h3>
-            <button class="copy-button" onclick="copyTableToClipboard('homework-texts-table')">
-                Copy to Clipboard
-            </button>
-            <button class="download-button" onclick="downloadTableAsCSV('homework-texts-table', 'Homework Detention Texts')">
-                Download as CSV
-            </button>
+        <!-- Homework Detention Texts -->
+        <div id="homework-texts" class="student-table-container homework-texts-container">
+            <h3>Students to send texts home for detention today</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('homework-texts-table')">Copy to Clipboard</button>
+            <button class="download-button" onclick="downloadTableAsCSV('homework-texts-table', 'Homework Detention Texts')">Download as CSV</button>
             <table id="homework-texts-table"></table>
         </div>
 
-        <!-- OPTIONAL STUDENTS SECTION -->
-        <div class="student-table-container optional-students-container">
-            <h3>Students removed as homework optional</h3>
-            <button class="copy-button" onclick="copyTableToClipboard('optional-student-table')">
-                Copy to Clipboard
-            </button>
-            <button class="download-button" onclick="downloadTableAsCSV('optional-student-table', 'Optional Students')">
-                Download as CSV
-            </button>
-            <table id="optional-student-table"></table>
-        </div>
+
     </div>
 
     <!-- Output Section -->
@@ -536,8 +654,9 @@
 
     let optionalDetentions = [];
     let ASDToday = [];
-    let TOTomorrow = [];
+    let TOToday = [];
     let homeworkDetentionTexts = [];
+    let slips = [];
 
     let filesLoaded = {
         detentionList: false,
@@ -632,6 +751,9 @@
                 if (!students[student.UPN]) {
                     students[student.UPN] = { details: student };
                 }
+                else{
+                    students[student.UPN].details = student;
+                }
             });
             document.getElementById("drop-zone-student-list").innerText = `Student List Loaded (${jsonData.length})`;
             filesLoaded.studentList = true;
@@ -645,7 +767,10 @@
         try {
             const jsonData = await parseExcelFile(file);
             jsonData.forEach(student => {
-                if (students[student.UPN]) {
+                if (!students[student.UPN]) {
+                    students[student.UPN] = {timetable : student};
+                }
+                else{
                     students[student.UPN].timetable = student;
                 }
             });
@@ -693,34 +818,31 @@
         let leftoverDetentions = [...detentions];
 
         // Categorize
-        optionalDetentions = detentions.filter(d => d.homeworkStatus === "Optional homework");
-        leftoverDetentions = detentions.filter(d => !(d.homeworkStatus === "Optional homework"));
+        optionalDetentions = detentions.filter(d => d.homeworkStatus === "Optional homework" && d["Detention type"] === "Homework Detention");
+        leftoverDetentions = detentions.filter(d => !(d.homeworkStatus === "Optional homework" && d["Detention type"] === "Homework Detention"));
 
         // 2) Absent students (Attendance Today = "0")
         absentDetentions = leftoverDetentions.filter(d => d.presentToday === 0);
         leftoverDetentions = leftoverDetentions.filter(d => d.presentToday !== 0);
 
-        TOTomorrow = leftoverDetentions.filter(d =>
-                (
-                    ((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") ||
-                    d.noDetentions === "Yes"
-                )
-        );
+        // Students moved to TO Today
+        TOToday = leftoverDetentions
+            .filter(d => ((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") || d.noDetentions === "Yes")
+            .map(d => ({ ...d, TO: "yes" })); // Add "type: TO"
 
-        leftoverDetentions = leftoverDetentions.filter(d =>
-                !((
-                    ((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") ||
-                    d.noDetentions === "Yes"
-                ))
-        );
+        leftoverDetentions = leftoverDetentions
+            .filter(d => !(((d["Year group"] === 7 || d["Year group"] === 8) && d.schoolBus === "Yes") || d.noDetentions === "Yes"))
 
-        ASDToday = leftoverDetentions
+        // Remaining students go into ASD Today
+        ASDToday = leftoverDetentions.map(d => ({ ...d, ASD: "yes" })); // Add "type: ASD"
 
         // Homework Detention Texts
         homeworkDetentionTexts = ASDToday.filter(d => d["Detention type"] === "Homework Detention");
 
+        slips = [...ASDToday, ...TOToday]
+
         // Sort ASD Today by room (letter then number)
-        ASDToday.sort((a, b) => {
+        slips.sort((a, b) => {
             const [letterA, numberA] = [a.noticeRoom[0], parseInt(a.noticeRoom.slice(1), 10)];
             const [letterB, numberB] = [b.noticeRoom[0], parseInt(b.noticeRoom.slice(1), 10)];
             if (letterA < letterB) return -1;
@@ -730,7 +852,7 @@
 
         // Generate tables
         generateStudentTable("optional-student-table", optionalDetentions);
-        generateStudentTable("TOT-student-table",      TOTomorrow);
+        generateStudentTable("TOT-student-table",      TOToday);
         generateStudentTable("ASDToday-student-table", ASDToday);
         generateStudentTable("homework-texts-table",   homeworkDetentionTexts);
         generateStudentTable("absent-student-table",   absentDetentions);
@@ -768,6 +890,10 @@
       </tr>`).join("");
 
         table.innerHTML = thead + `<tbody>${tbody}</tbody>`;
+        document.getElementById("button-generate-asdtoday-docs").disabled = false;
+
+        document.getElementById("button-download-spreadsheet").disabled = false;
+
     }
 
     function copyTableToClipboard(tableId) {
@@ -817,41 +943,80 @@
         document.getElementById("output").innerHTML = `<p style="color: red;">${message}</p>`;
     }
 
-    // NEW FUNCTION to loop through ASD Today detentions and populate the template:
+
+
+    document
+        .getElementById("button-generate-asdtoday-docs")
+        .addEventListener("click", generateASDTodayDocs);
     function generateASDTodayDocs() {
-        // Make sure the doc_template is loaded
+        // Ensure the template is loaded
         if (!doc_template) {
             alert("No .docx template loaded yet!");
             return;
         }
 
+        try {
+            // Clone the template to prevent modifications to the original
+            const zip = new PizZip(doc_template.zip.generate({ type: "arraybuffer" }));
+            const doc = new docxtemplater(zip, {
+                paragraphLoop: true,
+                linebreaks: true,
+            });
 
+            // Render the cloned document
+            doc.render({ detentions: slips });
 
-        const doc = doc_template
-        // Render the document (Replace {first_name} by John, {last_name} by Doe)
-        doc.render({
-            "detentions": ASDToday
-        });
+            // Generate and download the document
+            const blob = doc.getZip().generate({
+                type: "blob",
+                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                compression: "DEFLATE",
+            });
 
-
-        const blob = doc.getZip().generate({
-            type: "blob",
-            mimeType:
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            /*
-             * compression: DEFLATE adds a compression step.
-             * For a 50MB output document, expect 500ms additional CPU time
-             */
-            compression: "DEFLATE",
-        });
-        // Output the document using Data-URI
-        saveAs(blob, "output.docx");
+            saveAs(blob, "ASDToday_Document.docx");
+        } catch (error) {
+            console.error("Error generating document:", error);
+            alert("An error occurred while generating the document.");
+        }
     }
 
-    // NEW EVENT LISTENER for that button
-    document
-        .getElementById("button-generate-asdtoday-docs")
-        .addEventListener("click", generateASDTodayDocs);
+    document.getElementById("button-download-spreadsheet").addEventListener("click", downloadSpreadsheet);
+
+    function downloadSpreadsheet() {
+        const workbook = XLSX.utils.book_new(); // Create a new workbook
+
+        // Define the tables and their corresponding data
+        const tables = {
+            "Absent Students": absentDetentions,
+            "Optional Students": optionalDetentions,
+            "TO Today Students": TOToday,
+            "ASD Today": ASDToday,
+            "Homework Detention Texts": homeworkDetentionTexts
+        };
+
+        // Convert each table's data to a worksheet and add to the workbook
+        for (const [sheetName, data] of Object.entries(tables)) {
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        }
+
+        // Generate the file and trigger download
+        XLSX.writeFile(workbook, `Detention_Report_${new Date().toISOString().split("T")[0]}.xlsx`);
+    }
+
+</script>
+<script>
+
+
+
+    // Hide menu when clicking outside
+    document.addEventListener("click", function(event) {
+        const nav = document.querySelector(".floating-nav");
+        const button = document.getElementById("nav-toggle");
+        if (nav.style.display === "block" && !button.contains(event.target) && !nav.contains(event.target)) {
+            nav.style.display = "none";
+        }
+    });
 </script>
 </body>
 </html>
