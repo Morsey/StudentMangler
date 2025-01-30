@@ -75,7 +75,7 @@
             background-color: #007bff;
             cursor: not-allowed;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            width: 725px;
+            width: 620px;
         }
         #button-classify-detentions:enabled {
             cursor: pointer;
@@ -230,6 +230,7 @@
         .student-lists-container {
             margin: 0 0 20px 0; /* Adjust bottom margin if desired */
         }
+
 
         /* ***************************************
          * STYLES FOR EACH DETENTION TYPE SECTION
@@ -602,6 +603,8 @@
         <div id="drop-zone-detention-list" class="drop-zone">Detentions</div>
         <div id="drop-zone-timetable-list" class="drop-zone">Timetables</div>
         <div id="drop-zone-student-list" class="drop-zone">Students</div>
+        <div id="template-loaded-indicator" class="drop-zone" style="border-color: #28a745; color: #28a745;">Template Not Loaded</div>
+
     </div>
 
 
@@ -757,6 +760,10 @@
             });
 
             console.log("DOCX template loaded successfully!");
+            // ✅ Update the template indicator
+            document.getElementById("template-loaded-indicator").innerText = "Template Loaded ✅";
+            document.getElementById("template-loaded-indicator").style.borderColor = "#28a745";
+            document.getElementById("template-loaded-indicator").style.color = "#28a745";
         } catch (error) {
             console.error("Error processing DOCX file:", error);
         }
