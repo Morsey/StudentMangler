@@ -75,6 +75,7 @@
             background-color: #007bff;
             cursor: not-allowed;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            width: 725px;
         }
         #button-classify-detentions:enabled {
             cursor: pointer;
@@ -146,6 +147,30 @@
         }
         .download-button:hover {
             background-color: #0056b3;
+        }
+
+        #email-report-button {
+            color: #fff;
+            background-color: #ff9800; /* Orange */
+            cursor: not-allowed;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #email-report-button:enabled {
+            cursor: pointer;
+            background-color: #ff5722; /* Darker Orange */
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #email-report-button:enabled:hover {
+            background-color: #e64a19; /* Even Darker Orange */
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
         }
 
         /* Drop Zone Styles */
@@ -579,11 +604,16 @@
         <div id="drop-zone-student-list" class="drop-zone">Students</div>
     </div>
 
-    <!-- Buttons -->
-    <button id="button-reset" onclick="resetPage()">Reset</button>
+
     <button id="button-classify-detentions" disabled>Classify Detentions</button>
+<br>
+    <!-- Buttons -->
     <button id="button-generate-asdtoday-docs" disabled>Generate ASD Today Docs</button>
     <button id="button-download-spreadsheet" disabled>Download Spreadsheet</button>
+    <button id="email-report-button" disabled>📧 Email Report</button>
+    <br>
+
+    <button id="button-reset" onclick="resetPage()">Reset</button>
 
     <!-- Tables for Results -->
     <div class="student-lists-container">
@@ -891,7 +921,7 @@
 
         table.innerHTML = thead + `<tbody>${tbody}</tbody>`;
         document.getElementById("button-generate-asdtoday-docs").disabled = false;
-
+        document.getElementById("email-report-button").disabled = false;
         document.getElementById("button-download-spreadsheet").disabled = false;
 
     }
@@ -1017,6 +1047,30 @@
             nav.style.display = "none";
         }
     });
+
+    document.getElementById("email-report-button").addEventListener("click", composeEmail);
+
+    function composeEmail() {
+        if (optionalDetentions.length === 0 && absentDetentions.length === 0 && TOToday.length === 0) {
+            alert("No students to report.");
+            return;
+        }
+
+        let emailAddress = "mark.barlow@stjamesexeter.co.uk";
+        let subject = encodeURIComponent("Detention Report - Optional, Absent & TO Today");
+
+        let optionalList = optionalDetentions.map(d => `- ${d["First name"]} ${d["Last name"]} (${d["Behaviour type"]})`).join("\n");
+        let absentList = absentDetentions.map(d => `- ${d["First name"]} ${d["Last name"]} (${d["Behaviour type"]})`).join("\n");
+        let toTodayList = TOToday.map(d => `- ${d["First name"]} ${d["Last name"]} (${d["Behaviour type"]})`).join("\n");
+
+        let body = `Hello,\n\nHere is the list of students for today:\n\n` +
+            `**Optional Homework Students Removed:**\n${optionalList || "None"}\n\n` +
+            `**Absent Students:**\n${absentList || "None"}\n\n` +
+            `**Students Moved to TO Today:**\n${toTodayList || "None"}\n\nRegards,\nSt James Detentions Processor`;
+
+        let mailtoLink = `mailto:${emailAddress}?subject=${subject}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
+    }
 </script>
 </body>
 </html>
