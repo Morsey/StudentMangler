@@ -452,6 +452,49 @@
             color: #333;
         }
 
+        /* TWO HOUR ASD Detentions Section */
+        .two-hour-asd-container {
+            border: 2px solid #007bff;
+            background-color: #e7f3ff;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .two-hour-asd-container h3 {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 0;
+        }
+        .two-hour-asd-container table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #007bff;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .two-hour-asd-container th {
+            background-color: #007bff;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .two-hour-asd-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .two-hour-asd-container tr:hover {
+            background-color: #e0f7ff;
+        }
+        .two-hour-asd-container td {
+            padding: 10px;
+            color: #333;
+        }
+
         /* Instructions Container */
         .instructions-container {
             background-color: #ffffff;
@@ -543,6 +586,10 @@
         /* Smooth scrolling */
         html {
             scroll-behavior: smooth;
+        }
+
+        .hidden {
+            display: none;
         }
 
     </style>
@@ -661,6 +708,14 @@
             <table id="homework-texts-table"></table>
         </div>
 
+        <!-- TWO HOUR ASD Detentions -->
+        <div id="two-hour-asd" class="student-table-container two-hour-asd-container">
+            <h3>TWO HOUR ASD Detentions</h3>
+            <button class="copy-button" onclick="copyTableToClipboard('two-hour-asd-table')">Copy to Clipboard</button>
+            <button class="download-button" onclick="downloadTableAsCSV('two-hour-asd-table', 'TWO HOUR ASD Detentions')">Download as CSV</button>
+            <table id="two-hour-asd-table"></table>
+        </div>
+
 
     </div>
 
@@ -690,6 +745,7 @@
     let TOToday = [];
     let homeworkDetentionTexts = [];
     let slips = [];
+    let twoHourASDDetentions =[]
 
     let filesLoaded = {
         detentionList: false,
@@ -803,19 +859,25 @@
     async function processLocationsFile(file) {
         try {
             const jsonData = await parseExcelFile(file);
-            jsonData.forEach(student => {
-                if (!students[student.UPN]) {
-                    students[student.UPN] = {timetable : student};
+            jsonData.forEach(row => {
+                const upn = row.UPN;
+                const period = row["Period Display Name"];
+
+                // Ensure the student exists
+                if (!students[upn]) {
+                    students[upn] = { timetable: {} };
                 }
-                else{
-                    students[student.UPN].timetable = student;
-                }
+
+                // Store the timetable info for this period
+                students[upn].timetable[period] = row;
             });
+
             document.getElementById("drop-zone-timetable-list").innerText = `Timetable List Loaded (${jsonData.length})`;
             filesLoaded.timetableList = true;
             checkFilesLoaded();
         } catch (error) {
-            displayError("Error processing locations file.");
+            console.error("Error processing timetable file:", error);
+            displayError("Error processing timetable file.");
         }
     }
 
@@ -839,17 +901,75 @@
                 continue;
             }
 
-            // Add details
+            // Add basic student details.
             detention["presentToday"]   = student.details["Attendance Today"] ?? "";
             detention["homeworkStatus"] = student.details["Homework Status"] ?? "";
-            detention["schoolBus"]      = student.details["School Bus"]       ?? "";
-            detention["noDetentions"]   = student.details["No Detentions"]    ?? "";
+            detention["schoolBus"]      = student.details["School Bus"] ?? "";
+            detention["noDetentions"]   = student.details["No Detentions"] ?? "";
 
-            // Add timetable info
-            detention["noticeClassName"] = student.timetable?.["Class Name"]         ?? "";
-            detention["noticeRoom"]      = student.timetable?.["Room"]               ?? "";
-            detention["noticeStaffCode"] = student.timetable?.["Staff Code"]         ?? "";
-            detention["noticePeriod"]    = student.timetable?.["Period Display Name"]?? "";
+            // Determine the current weekday using JavaScript's Date.
+            const now = new Date();
+            const dayMap = {
+                1: "MON",
+                2: "TUE",
+                3: "WED",
+                4: "THU",
+                5: "FRI"
+            };
+            const currentDay = dayMap[now.getDay()];
+
+            // If it's not a weekday, set timetable info to blank.
+            if (!currentDay) {
+                detention["noticeClassName"]      = "";
+                detention["noticeRoom"]           = "";
+                detention["noticeStaffCode"]      = "";
+                detention["noticePeriod"]         = "";
+                detention["collectionClassName"]  = "";
+                detention["collectionRoom"]       = "";
+                detention["collectionStaffCode"]  = "";
+                detention["collectionPeriod"]     = "";
+                continue;
+            }
+
+            // --- Notice Information ---
+            // For notice details: use period 5 on Tuesday; otherwise use period 4.
+            const noticeLastDigit = (currentDay === "TUE") ? "5" : "4";
+            const noticeSuffix = currentDay + noticeLastDigit; // e.g. "TUE5" or "MON4"
+            let noticeEntry = null;
+            for (const key in student.timetable) {
+                if (key.slice(1) === noticeSuffix) {
+                    noticeEntry = student.timetable[key];
+                    break;
+                }
+            }
+            if (!noticeEntry) {
+                noticeEntry = {};
+            }
+
+            detention["noticeClassName"] = noticeEntry["Class Name"] ?? "";
+            detention["noticeRoom"]      = noticeEntry["Room"] ?? "";
+            detention["noticeStaffCode"] = noticeEntry["Staff Code"] ?? "";
+            detention["noticePeriod"]    = noticeEntry["Period Display Name"] ?? "";
+
+            // --- Collection Information ---
+            // For collection details: always use period 5, except for Tuesday where we use period 6.
+            const collectionLastDigit = (currentDay === "TUE") ? "6" : "5";
+            const collectionSuffix = currentDay + collectionLastDigit; // e.g. "TUE6" or "MON5"
+            let collectionEntry = null;
+            for (const key in student.timetable) {
+                if (key.slice(1) === collectionSuffix) {
+                    collectionEntry = student.timetable[key];
+                    break;
+                }
+            }
+            if (!collectionEntry) {
+                collectionEntry = {};
+            }
+
+            detention["collectionClassName"] = collectionEntry["Class Name"] ?? "";
+            detention["collectionRoom"]      = collectionEntry["Room"] ?? "";
+            detention["collectionStaffCode"] = collectionEntry["Staff Code"] ?? "";
+            detention["collectionPeriod"]    = collectionEntry["Period Display Name"] ?? "";
         }
 
         let leftoverDetentions = [...detentions];
@@ -879,13 +999,42 @@
         slips = [...ASDToday, ...TOToday]
 
         // Sort ASD Today by room (letter then number)
+        // Helper function to parse the noticeRoom string
+        function parseNoticeRoom(room) {
+            // This regex matches a string that starts with a letter followed by one or more digits
+            const match = room.match(/^([A-Za-z])(\d+)$/);
+            if (!match) return null;
+            return { letter: match[1], number: parseInt(match[2], 10) };
+        }
+
         slips.sort((a, b) => {
-            const [letterA, numberA] = [a.noticeRoom[0], parseInt(a.noticeRoom.slice(1), 10)];
-            const [letterB, numberB] = [b.noticeRoom[0], parseInt(b.noticeRoom.slice(1), 10)];
-            if (letterA < letterB) return -1;
-            if (letterA > letterB) return 1;
-            return numberA - numberB;
+            const roomA = parseNoticeRoom(a.noticeRoom);
+            const roomB = parseNoticeRoom(b.noticeRoom);
+
+            // Both rooms are valid; sort by letter first, then by number
+            if (roomA && roomB) {
+                if (roomA.letter < roomB.letter) return -1;
+                if (roomA.letter > roomB.letter) return 1;
+                return roomA.number - roomB.number;
+            }
+
+            // If only roomA is valid, it should come first
+            if (roomA && !roomB) {
+                return -1;
+            }
+
+            // If only roomB is valid, it should come first
+            if (!roomA && roomB) {
+                return 1;
+            }
+
+            // If neither room is valid, keep their relative order unchanged
+            return 0;
         });
+
+        // Filter for TWO HOUR ASD detentions - only use those confirmed as ASD
+        twoHourASDDetentions = ASDToday.filter(d => d["Detention type"] === "TWO HOUR ASD");
+
 
         // Generate tables
         generateStudentTable("optional-student-table", optionalDetentions);
@@ -893,6 +1042,7 @@
         generateStudentTable("ASDToday-student-table", ASDToday);
         generateStudentTable("homework-texts-table",   homeworkDetentionTexts);
         generateStudentTable("absent-student-table",   absentDetentions);
+        generateStudentTable("two-hour-asd-table", twoHourASDDetentions);
     }
 
     function generateStudentTable(tableId, data) {
@@ -900,13 +1050,17 @@
         table.innerHTML = "";
 
         const thead = `<thead><tr>
-      <th>UPN</th>
+      <th class="hidden">UPN</th>
       <th>Tutor</th>
       <th>Name</th>
-      <th>Type</th>
-      <th>Period 4 Room</th>
-      <th>Period 4 Class</th>
-      <th>Period 4 Teacher</th>
+      <th>Detention Type</th>
+      <th>Behaviour Type</th>
+      <th>Notice Room</th>
+      <th  class="hidden">Notice Class</th>
+      <th class="hidden">Notice Teacher</th>
+      <th>Collection Room</th>
+      <th class="hidden">Collection Class</th>
+      <th class="hidden">Collection Teacher</th>
       <th>Homework Status</th>
       <th>Bus</th>
       <th>No Detentions</th>
@@ -914,13 +1068,17 @@
 
         const tbody = data.map(d => `
       <tr>
-        <td>${d["Pupil ID"]}</td>
+        <td class="hidden">${d["Pupil ID"]}</td>
         <td>${d["Tutor group"]}</td>
         <td>${d["First name"]} ${d["Last name"]}</td>
+        <td>${d["Detention type"]}</td>
         <td>${d["Behaviour type"]}</td>
         <td>${d["noticeRoom"]}</td>
-        <td>${d["noticeClassName"]}</td>
-        <td>${d["noticeStaffCode"]}</td>
+        <td class="hidden">${d["noticeClassName"]}</td>
+        <td class="hidden">${d["noticeStaffCode"]}</td>
+        <td>${d["collectionRoom"]}</td>
+        <td class="hidden">${d["collectionClassName"]}</td>
+        <td class="hidden">${d["collectionStaffCode"]}</td>
         <td>${d["homeworkStatus"]}</td>
         <td>${d["schoolBus"]}</td>
         <td>${d["noDetentions"]}</td>
@@ -1000,8 +1158,19 @@
                 linebreaks: true,
             });
 
+            let roundedCount = Math.ceil(slips.length / 4) * 4;
+            let ordered_slips = new Array(roundedCount)
+            function calculateValue(detentionNumber, no_detentions) {
+                return (detentionNumber % (no_detentions / 4)) * 4 + Math.floor(detentionNumber / (no_detentions / 4));
+            }
+            // Copy the detentions, using imposition to order 4 to a page and allow cutting in blocks to retain order
+            slips.forEach((detention, index)=>{
+                detention.index = index;
+                ordered_slips[calculateValue(index, roundedCount)] = detention;
+            });
+
             // Render the cloned document
-            doc.render({ detentions: slips });
+            doc.render({ detentions: ordered_slips });
 
             // Generate and download the document
             const blob = doc.getZip().generate({
@@ -1064,19 +1233,27 @@
         }
 
         let emailAddress = "mark.barlow@stjamesexeter.co.uk";
-        let subject = encodeURIComponent("Detention Report - Optional, Absent & TO Today");
+        let subject = "Detention Report - Optional, Absent & TO Today";
 
         let optionalList = optionalDetentions.map(d => `- ${d["First name"]} ${d["Last name"]} (${d["Behaviour type"]})`).join("\n");
         let absentList = absentDetentions.map(d => `- ${d["First name"]} ${d["Last name"]} (${d["Behaviour type"]})`).join("\n");
         let toTodayList = TOToday.map(d => `- ${d["First name"]} ${d["Last name"]} (${d["Behaviour type"]})`).join("\n");
 
         let body = `Hello,\n\nHere is the list of students for today:\n\n` +
-            `**Optional Homework Students Removed:**\n${optionalList || "None"}\n\n` +
-            `**Absent Students:**\n${absentList || "None"}\n\n` +
-            `**Students Moved to TO Today:**\n${toTodayList || "None"}\n\nRegards,\nSt James Detentions Processor`;
+            `Optional Homework Students Removed:\n${optionalList || "None"}\n\n` +
+            `Absent Students:\n${absentList || "None"}\n\n` +
+            `Students Moved to TO Today:\n${toTodayList || "None"}\n\nRegards,\nSt James Detentions Processor`;
 
-        let mailtoLink = `mailto:${emailAddress}?subject=${subject}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailtoLink;
+        // Copy the body to clipboard
+        navigator.clipboard.writeText(body).then(() => {
+            alert("Email content copied to clipboard. Open the email and paste it.");
+        }).catch(err => {
+            console.error("Failed to copy text:", err);
+            alert("Failed to copy email content. Please copy manually.");
+        });
+
+        // Open a blank email in the user's default email client
+        window.location.href = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}`;
     }
 </script>
 </body>
