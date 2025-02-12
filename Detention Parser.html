@@ -867,6 +867,9 @@
                 if (!students[upn]) {
                     students[upn] = { timetable: {} };
                 }
+                if(!students[upn].timetable){
+                    students[upn].timetable = {};
+                }
 
                 // Store the timetable info for this period
                 students[upn].timetable[period] = row;
@@ -951,10 +954,14 @@
             detention["noticeStaffCode"] = noticeEntry["Staff Code"] ?? "";
             detention["noticePeriod"]    = noticeEntry["Period Display Name"] ?? "";
 
-            // --- Collection Information ---
+            // --- Collection Information --- ELECTIVE2
             // For collection details: always use period 5, except for Tuesday where we use period 6.
-            const collectionLastDigit = (currentDay === "TUE") ? "6" : "5";
-            const collectionSuffix = currentDay + collectionLastDigit; // e.g. "TUE6" or "MON5"
+            const collectionLastDigit = (currentDay === "TUE") ? "6" :  "5";
+            let collectionSuffix = currentDay + collectionLastDigit; // e.g. "TUE6" or "MON5"
+
+            // collect during elective 2 on a wednesday, no prefix to day. Removing the "E" from elective is a hack as there is no prefix week in the key
+            collectionSuffix = (currentDay === "WED") ? "LECTIVE2" : collectionSuffix;
+
             let collectionEntry = null;
             for (const key in student.timetable) {
                 if (key.slice(1) === collectionSuffix) {
